@@ -140,6 +140,7 @@ const ChatWrapper = () => {
       inputs: formatBooleanInputs(inputsForms, isHistoryConversation ? currentConversationInputs : newConversationInputs),
       conversation_id: currentConversationId,
       parent_message_id: (isRegenerate ? parentAnswer?.id : getLastAnswer(chatList)?.id) || null,
+      argument: "",
     }
     if (gree_mail) {
       data.gree_mail = gree_mail

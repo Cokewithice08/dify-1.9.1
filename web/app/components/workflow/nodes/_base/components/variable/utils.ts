@@ -385,7 +385,10 @@ const formatItem = (
         variable: 'sys.gree_token',
         type: VarType.string,
       })
-
+      res.vars.push({
+        variable: 'sys.argument',
+        type: VarType.string,
+      })
       break
     }
 

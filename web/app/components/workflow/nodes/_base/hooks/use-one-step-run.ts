@@ -324,6 +324,7 @@ const useOneStepRun = <T>({
           postData.inputs = inputs
           postData.query = query
           postData.files = files || []
+          postData.argument = ""
         }
         else {
           postData.inputs = submitData

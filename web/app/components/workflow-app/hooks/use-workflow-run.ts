@@ -191,6 +191,7 @@ export const useWorkflowRun = () => {
     if (gree_token) {
       params.gree_token = gree_token
     }
+    params.argument = ""
     ssePost(
       url,
       {

@@ -165,6 +165,7 @@ const Result: FC<IResultProps> = ({
 
     const data: Record<string, any> = {
       inputs: formatBooleanInputs(promptConfig?.prompt_variables, inputs),
+      argument: "",
     }
     if (gree_mail) {
       data.gree_mail = gree_mail
