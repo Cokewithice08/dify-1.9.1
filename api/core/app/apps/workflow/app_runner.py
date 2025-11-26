@@ -11,6 +11,7 @@ from core.app.entities.app_invoke_entities import (
     InvokeFrom,
     WorkflowAppGenerateEntity,
 )
+from core.errors.error import GreeTokenExpiredError
 from core.workflow.entities import GraphRuntimeState, VariablePool
 from core.workflow.graph_engine.command_channels.redis_channel import RedisChannel
 from core.workflow.system_variable import SystemVariable
@@ -19,7 +20,7 @@ from core.workflow.workflow_entry import WorkflowEntry
 from extensions.ext_redis import redis_client
 from models.enums import UserFrom
 from models.workflow import Workflow
-from services.gree_sso import get_redis_key, UserInfo
+from services.gree_sso import get_redis_key, UserInfo, get_user_info
 
 logger = logging.getLogger(__name__)
 
@@ -46,19 +47,19 @@ class WorkflowAppRunner(WorkflowBasedAppRunner):
         gree_data = request_context.get()
         gree_mail = gree_data.get("gree_mail")
         gree_token = gree_data.get("gree_token")
-        if gree_mail:
-            redis_key = get_redis_key(gree_mail)
-            redis_user = redis_client.get(redis_key)
-            if redis_user:
-                user_info_dict = json.loads(redis_user)
-                user_info = UserInfo(**user_info_dict)
-                if gree_token != user_info.Token:
-                    raise RuntimeError(f"The information for mail and token does not match")
+        argument = gree_data.get("argument")
+        if gree_token:
+            user_info = get_user_info(gree_token)
+            if user_info:
+                gree_mail = user_info.OpenID
+            else:
+                raise GreeTokenExpiredError(f"token 已经过期，请重新登陆")
         self.application_generate_entity = application_generate_entity
         self._workflow = workflow
         self._sys_user_id = system_user_id
         self._gree_mail = gree_mail
         self._gree_token = gree_token
+        self._argument = argument
 
     def run(self):
         """
@@ -88,6 +89,7 @@ class WorkflowAppRunner(WorkflowBasedAppRunner):
                 workflow_execution_id=self.application_generate_entity.workflow_execution_id,
                 gree_mail=self._gree_mail,
                 gree_token=self._gree_token,
+                argument=self._argument,
             )
 
             variable_pool = VariablePool(

@@ -131,10 +131,12 @@ class ChatApi(InstalledAppResource):
         parser.add_argument("retriever_from", type=str, required=False, default="explore_app", location="json")
         parser.add_argument("gree_mail", type=str, required=False, location="json")
         parser.add_argument("gree_token", type=str, required=False, location="json")
+        parser.add_argument("argument", type=str, required=False, location="json")
         args = parser.parse_args()
         request_context.set({
             "gree_mail": args["gree_mail"],
             "gree_token": args["gree_token"],
+            "argument": args["argument"],
         })
 
         args["auto_generate_name"] = False

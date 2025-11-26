@@ -15,13 +15,13 @@ logger = logging.getLogger(__name__)
 GREE_SSO_URL_GET_TOKEN = 'http://wfserver.gree.com/sso/ssoapi/GetToken'
 GREE_SSO_URL_GET_USER_INFO = 'http://wfserver.gree.com/sso/ssoapi/GetUserInfo'
 GREE_SSO_SIGN_OUT = 'https://wfserver.gree.com/sso/ssoapi/SignOut'
-# GREE_SSO_APP_ID = '0347f117-1b67-46a1-b4ec-a173f7bffa14'
-# GREE_SSO_APP_KEY = '2ce5a8c1-3a99-4036-92cc-a8f434b1a17c'
+GREE_SSO_APP_ID = '0347f117-1b67-46a1-b4ec-a173f7bffa14'
+GREE_SSO_APP_KEY = '2ce5a8c1-3a99-4036-92cc-a8f434b1a17c'
 
 
 # 测试环境使用如下
-GREE_SSO_APP_ID = '0347f117-1b67-46a1-b4ec-a173f7bffa14'
-GREE_SSO_APP_KEY = '2ce5a8c1-3a99-4036-92cc-a8f434b1a17c'
+#GREE_SSO_APP_ID = '0347f117-1b67-46a1-b4ec-a173f7bffa14'
+#GREE_SSO_APP_KEY = '2ce5a8c1-3a99-4036-92cc-a8f434b1a17c'
 
 
 # redis key

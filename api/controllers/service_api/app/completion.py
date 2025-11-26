@@ -65,6 +65,7 @@ chat_parser.add_argument(
 )
 chat_parser.add_argument("gree_mail", type=str, required=False, location="json")
 chat_parser.add_argument("gree_token", type=str, required=False, location="json")
+chat_parser.add_argument("argument", type=str, required=False, location="json")
 chat_parser.add_argument(
     "auto_generate_name",
     type=bool,
@@ -194,6 +195,7 @@ class ChatApi(Resource):
         request_context.set({
             "gree_mail": args["gree_mail"],
             "gree_token": args["gree_token"],
+            "argument": args["argument"],
         })
         external_trace_id = get_external_trace_id(request)
         if external_trace_id:

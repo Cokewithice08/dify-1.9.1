@@ -226,10 +226,12 @@ class AdvancedChatDraftWorkflowRunApi(Resource):
         parser.add_argument("parent_message_id", type=uuid_value, required=False, location="json")
         parser.add_argument("gree_mail", type=str, required=False, location="json")
         parser.add_argument("gree_token", type=str, required=False, location="json")
+        parser.add_argument("argument", type=str, required=False, location="json")
         args = parser.parse_args()
         request_context.set({
             "gree_mail": args["gree_mail"],
             "gree_token": args["gree_token"],
+            "argument": args["argument"],
         })
 
         external_trace_id = get_external_trace_id(request)
@@ -501,10 +503,12 @@ class DraftWorkflowRunApi(Resource):
         parser.add_argument("files", type=list, required=False, location="json")
         parser.add_argument("gree_mail", type=str, required=False, location="json")
         parser.add_argument("gree_token", type=str, required=False, location="json")
+        parser.add_argument("argument", type=str, required=False, location="json")
         args = parser.parse_args()
         request_context.set({
             "gree_mail": args["gree_mail"],
             "gree_token": args["gree_token"],
+            "argument": args["argument"],
         })
 
         external_trace_id = get_external_trace_id(request)
@@ -596,11 +600,12 @@ class DraftWorkflowNodeRunApi(Resource):
         parser.add_argument("files", type=list, location="json", default=[])
         parser.add_argument("gree_mail", type=str, required=False, location="json")
         parser.add_argument("gree_token", type=str, required=False, location="json")
-
+        parser.add_argument("argument", type=str, required=False, location="json")
         args = parser.parse_args()
         request_context.set({
             "gree_mail": args["gree_mail"],
             "gree_token": args["gree_token"],
+            "argument": args["argument"],
         })
         user_inputs = args.get("inputs")
         if user_inputs is None:

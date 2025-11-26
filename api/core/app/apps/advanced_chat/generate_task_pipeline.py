@@ -60,6 +60,7 @@ from core.app.entities.task_entities import (
 from core.app.task_pipeline.based_generate_task_pipeline import BasedGenerateTaskPipeline
 from core.app.task_pipeline.message_cycle_manager import MessageCycleManager
 from core.base.tts import AppGeneratorTTSPublisher, AudioTrunk
+from core.errors.error import GreeTokenExpiredError
 from core.model_runtime.entities.llm_entities import LLMUsage
 from core.ops.ops_trace_manager import TraceQueueManager
 from core.workflow.entities import GraphRuntimeState
@@ -77,7 +78,7 @@ from models import Conversation, EndUser, Message, MessageFile
 from models.account import Account
 from models.enums import CreatorUserRole
 from models.workflow import Workflow
-from services.gree_sso import get_redis_key, UserInfo
+from services.gree_sso import get_redis_key, UserInfo, get_user_info
 
 logger = logging.getLogger(__name__)
 
@@ -120,14 +121,13 @@ class AdvancedChatAppGenerateTaskPipeline:
         gree_data = request_context.get()
         gree_mail = gree_data.get("gree_mail")
         gree_token = gree_data.get("gree_token")
-        if gree_mail:
-            redis_key = get_redis_key(gree_mail)
-            redis_user = redis_client.get(redis_key)
-            if redis_user:
-                user_info_dict = json.loads(redis_user)
-                user_info = UserInfo(**user_info_dict)
-                if gree_token != user_info.Token:
-                    raise RuntimeError(f"The information for mail and token does not match")
+        argument = gree_data.get("argument")
+        if gree_token:
+            user_info = get_user_info(gree_token)
+            if user_info:
+                gree_mail = user_info.OpenID
+            else:
+                raise GreeTokenExpiredError(f"token 已经过期，请重新登陆")
         self._workflow_cycle_manager = WorkflowCycleManager(
             application_generate_entity=application_generate_entity,
             workflow_system_variables=SystemVariable(
@@ -141,6 +141,7 @@ class AdvancedChatAppGenerateTaskPipeline:
                 workflow_execution_id=application_generate_entity.workflow_run_id,
                 gree_mail=gree_mail,
                 gree_token=gree_token,
+                argument=argument,
             ),
             workflow_info=CycleManagerWorkflowInfo(
                 workflow_id=workflow.id,

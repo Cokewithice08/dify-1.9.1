@@ -52,6 +52,7 @@ class SystemVariable(BaseModel):
     invoke_from: str | None = None
     gree_mail: str | None = None
     gree_token: str | None = None
+    argument: str | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -113,4 +114,6 @@ class SystemVariable(BaseModel):
             d[SystemVariableKey.GREE_MAIL] = self.gree_mail
         if self.gree_token is not None:
             d[SystemVariableKey.GREE_TOKEN] = self.gree_token
+        if self.argument is not None:
+            d[SystemVariableKey.ARGUMENT] = self.argument
         return d

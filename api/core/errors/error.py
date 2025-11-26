@@ -52,3 +52,10 @@ class InvokeRateLimitError(ValueError):
     """Raised when the Invoke returns rate limit error."""
 
     description = "Rate Limit Error"
+
+
+class GreeTokenExpiredError(ValueError):
+    """
+    token 过期不能从格力单点登录中拿到用户信息等值
+    """
+    description = " The Token cannot be retrieved form gree sso"

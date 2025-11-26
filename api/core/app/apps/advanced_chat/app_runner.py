@@ -22,6 +22,7 @@ from core.app.entities.queue_entities import (
     QueueTextChunkEvent,
 )
 from core.app.features.annotation_reply.annotation_reply import AnnotationReplyFeature
+from core.errors.error import GreeTokenExpiredError
 from core.moderation.base import ModerationError
 from core.moderation.input_moderation import InputModeration
 from core.variables.variables import VariableUnion
@@ -36,7 +37,7 @@ from models import Workflow
 from models.enums import UserFrom
 from models.model import App, Conversation, Message, MessageAnnotation
 from models.workflow import ConversationVariable
-from services.gree_sso import get_redis_key, UserInfo
+from services.gree_sso import get_redis_key, UserInfo, get_user_info
 
 logger = logging.getLogger(__name__)
 
@@ -67,14 +68,13 @@ class AdvancedChatAppRunner(WorkflowBasedAppRunner):
         gree_data = request_context.get()
         gree_mail = gree_data.get("gree_mail")
         gree_token = gree_data.get("gree_token")
-        if gree_mail:
-            redis_key = get_redis_key(gree_mail)
-            redis_user = redis_client.get(redis_key)
-            if redis_user:
-                user_info_dict = json.loads(redis_user)
-                user_info = UserInfo(**user_info_dict)
-                if gree_token != user_info.Token:
-                    raise RuntimeError(f"The information for mail and token does not match")
+        argument = gree_data.get("argument")
+        if gree_token:
+            user_info = get_user_info(gree_token)
+            if user_info:
+                gree_mail = user_info.OpenID
+            else:
+                raise GreeTokenExpiredError(f"token 已经过期，请重新登陆")
         self.application_generate_entity = application_generate_entity
         self.conversation = conversation
         self.message = message
@@ -84,6 +84,7 @@ class AdvancedChatAppRunner(WorkflowBasedAppRunner):
         self._app = app
         self._gree_mail = gree_mail
         self._gree_token = gree_token
+        self._argument = argument
 
     def run(self):
         app_config = self.application_generate_entity.app_config
@@ -141,6 +142,7 @@ class AdvancedChatAppRunner(WorkflowBasedAppRunner):
                 workflow_execution_id=self.application_generate_entity.workflow_run_id,
                 gree_mail=self._gree_mail,
                 gree_token=self._gree_token,
+                argument=self._argument,
             )
 
             # init variable pool

@@ -49,6 +49,7 @@ workflow_run_parser.add_argument("files", type=list, required=False, location="j
 workflow_run_parser.add_argument("response_mode", type=str, choices=["blocking", "streaming"], location="json")
 workflow_run_parser.add_argument("gree_mail", type=str, required=False, location="json")
 workflow_run_parser.add_argument("gree_token", type=str, required=False, location="json")
+workflow_run_parser.add_argument("argument", type=str, required=False, location="json")
 
 workflow_log_parser = reqparse.RequestParser()
 workflow_log_parser.add_argument("keyword", type=str, location="args")
@@ -157,6 +158,7 @@ class WorkflowRunApi(Resource):
         request_context.set({
             "gree_mail": args["gree_mail"],
             "gree_token": args["gree_token"],
+            "argument": args["argument"],
         })
         external_trace_id = get_external_trace_id(request)
         if external_trace_id:

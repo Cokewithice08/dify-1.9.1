@@ -11,6 +11,7 @@ from core.app.entities.app_invoke_entities import (
     InvokeFrom,
     RagPipelineGenerateEntity,
 )
+from core.errors.error import GreeTokenExpiredError
 from core.variables.variables import RAGPipelineVariable, RAGPipelineVariableInput
 from core.workflow.entities.graph_init_params import GraphInitParams
 from core.workflow.entities.graph_runtime_state import GraphRuntimeState
@@ -27,7 +28,7 @@ from models.dataset import Document, Pipeline
 from models.enums import UserFrom
 from models.model import EndUser
 from models.workflow import Workflow
-from services.gree_sso import get_redis_key, UserInfo
+from services.gree_sso import get_redis_key, UserInfo, get_user_info
 
 logger = logging.getLogger(__name__)
 
@@ -59,20 +60,20 @@ class PipelineRunner(WorkflowBasedAppRunner):
         gree_data = request_context.get()
         gree_mail = gree_data.get("gree_mail")
         gree_token = gree_data.get("gree_token")
-        if gree_mail:
-            redis_key = get_redis_key(gree_mail)
-            redis_user = redis_client.get(redis_key)
-            if redis_user:
-                user_info_dict = json.loads(redis_user)
-                user_info = UserInfo(**user_info_dict)
-                if gree_token != user_info.Token:
-                    raise RuntimeError(f"The information for mail and token does not match")
+        argument = gree_data.get("argument")
+        if gree_token:
+            user_info = get_user_info(gree_token)
+            if user_info:
+                gree_mail = user_info.OpenID
+            else:
+                raise GreeTokenExpiredError(f"token 已经过期，请重新登陆")
         self.application_generate_entity = application_generate_entity
         self.workflow_thread_pool_id = workflow_thread_pool_id
         self._workflow = workflow
         self._sys_user_id = system_user_id
         self._gree_mail = gree_mail
         self._gree_token = gree_token
+        self._argument = argument
 
     def _get_app_id(self) -> str:
         return self.application_generate_entity.app_config.app_id
@@ -130,6 +131,7 @@ class PipelineRunner(WorkflowBasedAppRunner):
                 invoke_from=self.application_generate_entity.invoke_from.value,
                 gree_mail=self._gree_mail,
                 gree_token=self._gree_token,
+                argument=self._argument,
             )
 
             rag_pipeline_variables = []
