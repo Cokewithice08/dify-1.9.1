@@ -20,8 +20,8 @@ GREE_SSO_APP_KEY = '2ce5a8c1-3a99-4036-92cc-a8f434b1a17c'
 
 
 # 测试环境使用如下
-#GREE_SSO_APP_ID = '0347f117-1b67-46a1-b4ec-a173f7bffa14'
-#GREE_SSO_APP_KEY = '2ce5a8c1-3a99-4036-92cc-a8f434b1a17c'
+#GREE_SSO_APP_ID = '5f4e61c6-29a2-40b2-a62e-c99602dc1f30'
+#GREE_SSO_APP_KEY = '9ab4a757-5bb1-474f-948e-44866d3e7ffe'
 
 
 # redis key
